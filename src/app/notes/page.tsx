@@ -4,10 +4,10 @@ import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import NavBar from '@/components/ui/NavBar';
 import NoteCard from '@/components/notes/NoteCard';
 import { Note } from '@/types';
 import { generateSmartTaskSuggestions } from '@/utils/ocr';
+import Button from '@/components/ui/Button';
 
 export default function NotesPage() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -61,67 +61,76 @@ export default function NotesPage() {
   );
 
   return (
-    <div className="min-h-screen pb-16">
-      <div className="max-w-3xl mx-auto p-4">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Your Notes</h1>
-          <Link href="/capture" className="floating-action-button -mt-2">
-            <PlusIcon className="w-6 h-6" />
-          </Link>
-        </div>
-
-        {/* Search Bar */}
-        <div className="relative mb-6">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
-          </div>
-          <input
-            type="text"
-            className="bg-white dark:bg-gray-800 w-full py-2 pl-10 pr-4 rounded-lg border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="Search notes..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
-        {isLoading ? (
-          <div className="flex justify-center items-center h-40">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        ) : notes.length === 0 ? (
-          <div className="text-center py-10 bg-white dark:bg-gray-800 rounded-lg shadow">
-            <h3 className="text-lg font-medium mb-2">No notes yet</h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">
-              Capture your handwritten notes to get started
-            </p>
-            <Link
-              href="/capture"
-              className="btn-primary inline-flex items-center justify-center"
-            >
-              <PlusIcon className="w-5 h-5 mr-2" />
-              Capture a Note
-            </Link>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {filteredNotes.length === 0 ? (
-              <p className="text-center py-4">No notes match your search</p>
-            ) : (
-              filteredNotes.map((note) => (
-                <NoteCard
-                  key={note.id}
-                  note={note}
-                  onCreateTask={handleCreateTask}
-                  onEdit={handleEditNote}
-                  onDelete={handleDeleteNote}
-                />
-              ))
-            )}
-          </div>
-        )}
+    <div className="container-app py-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Your Notes</h1>
+        <Link href="/capture">
+          <Button 
+            variant="primary" 
+            size="sm"
+            startIcon={<PlusIcon className="w-4 h-4" />}
+          >
+            New
+          </Button>
+        </Link>
       </div>
 
-      <NavBar />
+      {/* Search Bar */}
+      <div className="relative mb-6">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <MagnifyingGlassIcon className="w-5 h-5 text-neutral-400" />
+        </div>
+        <input
+          type="text"
+          className="glass-panel-subtle w-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-primary"
+          placeholder="Search notes..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center items-center h-40">
+          <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+        </div>
+      ) : notes.length === 0 ? (
+        <div className="glass-panel p-8 text-center">
+          <h3 className="text-lg font-medium mb-4">No notes yet</h3>
+          <p className="text-neutral-600 dark:text-neutral-400 mb-6">
+            Capture your handwritten notes to get started
+          </p>
+          <Button
+            variant="primary"
+            startIcon={<PlusIcon className="w-5 h-5" />}
+          >
+            <Link href="/capture" className="w-full h-full flex items-center justify-center">
+              Capture a Note
+            </Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+          {filteredNotes.length === 0 ? (
+            <div className="col-span-full text-center py-8 glass-panel-subtle">
+              <p>No notes match your search</p>
+            </div>
+          ) : (
+            filteredNotes.map((note) => (
+              <NoteCard
+                key={note.id}
+                note={note}
+                onCreateTask={handleCreateTask}
+                onEdit={handleEditNote}
+                onDelete={handleDeleteNote}
+              />
+            ))
+          )}
+        </div>
+      )}
+      
+      <Link href="/capture" className="floating-action-button">
+        <PlusIcon className="w-6 h-6" />
+      </Link>
     </div>
   );
 } 

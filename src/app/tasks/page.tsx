@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { PlusIcon, FunnelIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, FunnelIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { Task } from '@/types';
 import TaskItem from '@/components/tasks/TaskItem';
-import NavBar from '@/components/ui/NavBar';
+import Button from '@/components/ui/Button';
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -107,89 +107,100 @@ export default function TasksPage() {
   };
 
   return (
-    <div className="min-h-screen pb-16">
-      <div className="max-w-3xl mx-auto p-4">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Your Tasks</h1>
-          <Link href="/tasks/create" className="floating-action-button -mt-2">
-            <PlusIcon className="w-6 h-6" />
-          </Link>
+    <div className="container-app py-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Your Tasks</h1>
+        <Link href="/tasks/create">
+          <Button 
+            variant="primary" 
+            size="sm"
+            startIcon={<PlusIcon className="w-4 h-4" />}
+          >
+            New
+          </Button>
+        </Link>
+      </div>
+      
+      {/* Filters and Sort Options */}
+      <div className="flex flex-wrap gap-3 mb-6">
+        <div className="glass-panel-subtle flex rounded-lg overflow-hidden">
+          <button
+            className={`px-4 py-2 text-sm font-medium transition-colors ${filter === 'all' ? 'bg-primary text-white' : ''}`}
+            onClick={() => setFilter('all')}
+          >
+            All
+          </button>
+          <button
+            className={`px-4 py-2 text-sm font-medium transition-colors ${filter === 'pending' ? 'bg-primary text-white' : ''}`}
+            onClick={() => setFilter('pending')}
+          >
+            Pending
+          </button>
+          <button
+            className={`px-4 py-2 text-sm font-medium transition-colors ${filter === 'completed' ? 'bg-primary text-white' : ''}`}
+            onClick={() => setFilter('completed')}
+          >
+            Completed
+          </button>
         </div>
         
-        {/* Filters and Sort Options */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          <div className="flex items-center bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700">
-            <button
-              className={`px-3 py-1.5 text-sm font-medium rounded-l-md ${filter === 'all' ? 'bg-blue-100 dark:bg-blue-900/30 text-primary' : ''}`}
-              onClick={() => setFilter('all')}
-            >
-              All
-            </button>
-            <button
-              className={`px-3 py-1.5 text-sm font-medium ${filter === 'pending' ? 'bg-blue-100 dark:bg-blue-900/30 text-primary' : ''}`}
-              onClick={() => setFilter('pending')}
-            >
-              Pending
-            </button>
-            <button
-              className={`px-3 py-1.5 text-sm font-medium rounded-r-md ${filter === 'completed' ? 'bg-blue-100 dark:bg-blue-900/30 text-primary' : ''}`}
-              onClick={() => setFilter('completed')}
-            >
-              Completed
-            </button>
-          </div>
-          
-          <div className="flex items-center ml-auto gap-2">
-            <FunnelIcon className="w-4 h-4 text-gray-500" />
-            <span className="text-sm text-gray-500">Sort by:</span>
+        <div className="flex items-center ml-auto">
+          <div className="flex items-center gap-2 glass-panel-subtle px-3 py-2 rounded-lg">
+            <FunnelIcon className="w-4 h-4 text-neutral-500" />
             <select
-              className="bg-white dark:bg-gray-800 text-sm border border-gray-200 dark:border-gray-700 rounded-md px-2 py-1.5"
+              className="bg-transparent text-sm appearance-none focus:outline-none pr-6"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'priority' | 'date')}
             >
-              <option value="date">Date</option>
-              <option value="priority">Priority</option>
+              <option value="date">Sort by date</option>
+              <option value="priority">Sort by priority</option>
             </select>
+            <ChevronDownIcon className="w-4 h-4 text-neutral-500 absolute right-3 pointer-events-none" />
           </div>
         </div>
-
-        {isLoading ? (
-          <div className="flex justify-center items-center h-40">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        ) : tasks.length === 0 ? (
-          <div className="text-center py-10 bg-white dark:bg-gray-800 rounded-lg shadow">
-            <h3 className="text-lg font-medium mb-2">No tasks yet</h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">
-              Create tasks from your notes or add them manually
-            </p>
-            <Link
-              href="/tasks/create"
-              className="btn-primary inline-flex items-center justify-center"
-            >
-              <PlusIcon className="w-5 h-5 mr-2" />
-              Create Task
-            </Link>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {filteredAndSortedTasks.length === 0 ? (
-              <p className="text-center py-4">No tasks match your filters</p>
-            ) : (
-              filteredAndSortedTasks.map((task) => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onStatusChange={handleStatusChange}
-                  onSelect={handleSelectTask}
-                />
-              ))
-            )}
-          </div>
-        )}
       </div>
 
-      <NavBar />
+      {isLoading ? (
+        <div className="flex justify-center items-center h-40">
+          <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+        </div>
+      ) : tasks.length === 0 ? (
+        <div className="glass-panel p-8 text-center">
+          <h3 className="text-lg font-medium mb-4">No tasks yet</h3>
+          <p className="text-neutral-600 dark:text-neutral-400 mb-6">
+            Create tasks from your notes or add them manually
+          </p>
+          <Button
+            variant="primary"
+            startIcon={<PlusIcon className="w-5 h-5" />}
+          >
+            <Link href="/tasks/create" className="w-full h-full flex items-center justify-center">
+              Create Task
+            </Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filteredAndSortedTasks.length === 0 ? (
+            <div className="glass-panel-subtle text-center py-6">
+              <p>No tasks match your filters</p>
+            </div>
+          ) : (
+            filteredAndSortedTasks.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onStatusChange={handleStatusChange}
+                onSelect={handleSelectTask}
+              />
+            ))
+          )}
+        </div>
+      )}
+      
+      <Link href="/tasks/create" className="floating-action-button">
+        <PlusIcon className="w-6 h-6" />
+      </Link>
     </div>
   );
 } 

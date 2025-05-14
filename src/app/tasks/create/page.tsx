@@ -177,7 +177,7 @@ export default function CreateTaskPage() {
             <div className="flex gap-2">
               <Button
                 type="button"
-                variant={priority === 'low' ? 'default' : 'outline'}
+                variant={priority === 'low' ? 'primary' : 'outline'}
                 size="sm"
                 className={priority === 'low' ? 'bg-blue-500 hover:bg-blue-600' : ''}
                 onClick={() => setPriority('low')}
@@ -186,7 +186,7 @@ export default function CreateTaskPage() {
               </Button>
               <Button
                 type="button"
-                variant={priority === 'medium' ? 'default' : 'outline'}
+                variant={priority === 'medium' ? 'primary' : 'outline'}
                 size="sm"
                 className={priority === 'medium' ? 'bg-amber-500 hover:bg-amber-600' : ''}
                 onClick={() => setPriority('medium')}
@@ -195,7 +195,7 @@ export default function CreateTaskPage() {
               </Button>
               <Button
                 type="button"
-                variant={priority === 'high' ? 'default' : 'outline'}
+                variant={priority === 'high' ? 'primary' : 'outline'}
                 size="sm"
                 className={priority === 'high' ? 'bg-red-500 hover:bg-red-600' : ''}
                 onClick={() => setPriority('high')}
@@ -284,6 +284,7 @@ export default function CreateTaskPage() {
             </Button>
             <Button
               type="button"
+              variant="primary"
               disabled={!title.trim()}
               onClick={handleCreateTask}
             >

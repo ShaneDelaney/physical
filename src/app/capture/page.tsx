@@ -181,7 +181,7 @@ export default function CapturePage() {
               </Button>
               
               <Button
-                variant="default"
+                variant="primary"
                 className="flex-1"
                 onClick={processImage}
                 disabled={isProcessing}
