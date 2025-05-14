@@ -1,36 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PhysicalNotes - Handwritten Note to Digital Task Converter
+
+PhysicalNotes is a modern web application that bridges the gap between physical handwritten notes and digital task management. The app allows users to capture photos of their handwritten notes and uses AI to extract content, detect action items, and organize them into digital tasks.
+
+## Key Features
+
+- **AI-Powered OCR & NLP**: Extract text, tasks, dates, and context from handwritten notes using computer vision and natural language processing.
+
+- **Task Extraction**: Automatically identify action items and generate task suggestions with appropriate priorities, due dates, and tags.
+
+- **Visual Note Inbox**: Display digitized notes in a scrollable, searchable interface for quick reference.
+
+- **Task Management**: Organize, prioritize, and track tasks extracted from your notes with due dates, priority levels, and completion status.
+
+- **Smart Cadence System**: Configure intelligent notification timing based on priority, user habits, and quiet hours.
+
+- **Calendar Integration**: Sync tasks with your calendar systems (Google Calendar, Apple Calendar, etc.).
+
+- **Household Mode**: Support for multiple users to share notes and tasks (coming soon).
+
+## Tech Stack
+
+- **Frontend**: Next.js with TypeScript, React, and TailwindCSS
+- **UI Components**: Custom components with Headless UI
+- **OCR Processing**: Tesseract.js for client-side text extraction
+- **State Management**: React Hooks and Context API
+- **Styling**: TailwindCSS with a mobile-first approach
+- **Icons**: Heroicons
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 18.x or higher
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/physical-notes.git
+   cd physical-notes
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Usage
+
+1. **Capture Notes**: Use the Capture feature to take a photo of your handwritten notes.
+2. **Review Extraction**: The AI will extract text and suggest possible tasks.
+3. **Manage Tasks**: Accept task suggestions or create your own tasks manually.
+4. **Track Progress**: Mark tasks as complete and maintain your productivity streak.
+
+## Project Structure
+
+```
+/
+├── public/              # Static assets
+├── src/
+│   ├── app/             # Next.js app directory
+│   │   ├── capture/     # Note capture page
+│   │   ├── notes/       # Notes listing page
+│   │   ├── tasks/       # Tasks pages
+│   │   └── profile/     # User profile page
+│   ├── components/      # React components
+│   │   ├── notes/       # Note-related components
+│   │   ├── tasks/       # Task-related components
+│   │   └── ui/          # Shared UI components
+│   ├── lib/             # Utility functions
+│   ├── types/           # TypeScript type definitions
+│   └── utils/           # Helper utilities
+└── package.json         # Project dependencies
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Future Enhancements
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Backend Integration**: Add a proper backend with authentication and database storage
+- **Machine Learning Improvements**: Enhance OCR accuracy and task extraction
+- **Collaborative Features**: Share notes and tasks with other users
+- **Calendar Integration**: Sync tasks with external calendar services
+- **Mobile App**: Native mobile applications for iOS and Android
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Contributing
 
-## Learn More
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Acknowledgements
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js](https://nextjs.org/)
+- [TailwindCSS](https://tailwindcss.com/)
+- [Heroicons](https://heroicons.com/)
+- [Tesseract.js](https://tesseract.projectnaptha.com/)
