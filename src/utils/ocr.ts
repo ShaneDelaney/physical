@@ -1,9 +1,18 @@
 import { createWorker } from 'tesseract.js';
 import { OCRResult, TaskSuggestion } from '@/types';
 import { extractTasksWithOpenAI } from './openai';
+import { 
+  extractTasksWithGemini, 
+  extractTasksFromImageWithGemini,
+  submitFeedbackForImprovement 
+} from './gemini';
+
+// Determine which AI provider to use based on environment configuration
+const AI_PROVIDER = process.env.API_PROVIDER || 'gemini';
 
 /**
  * Process an image using Tesseract OCR to extract text
+ * @deprecated Consider using processImageWithAI instead for better accuracy
  */
 export async function processImageWithOCR(imageData: string): Promise<OCRResult> {
   try {
@@ -18,6 +27,44 @@ export async function processImageWithOCR(imageData: string): Promise<OCRResult>
   } catch (error) {
     console.error('OCR processing error:', error);
     throw new Error('Failed to process image with OCR');
+  }
+}
+
+/**
+ * Process an image directly with AI Vision to extract text and identify tasks
+ * This bypasses the OCR step for better accuracy
+ */
+export async function processImageWithAI(imageData: string): Promise<OCRResult & { taskSuggestions: TaskSuggestion[] }> {
+  try {
+    // Use Gemini Vision to analyze the image directly
+    console.log('Processing image with AI Vision...');
+    
+    // Extract tasks directly from the image
+    const taskSuggestions = await extractTasksFromImageWithGemini(imageData);
+    
+    // For legacy compatibility, still return extracted text
+    // In a real app, we would have a better OCR implementation
+    const worker = await createWorker('eng');
+    const { data } = await worker.recognize(imageData);
+    await worker.terminate();
+    
+    console.log(`AI Vision extracted ${taskSuggestions.length} task suggestions`);
+    
+    return {
+      text: data.text,
+      confidence: data.confidence,
+      taskSuggestions
+    };
+  } catch (error) {
+    console.error('AI Vision processing error:', error);
+    // Fall back to traditional OCR with separate task extraction
+    const ocrResult = await processImageWithOCR(imageData);
+    const taskSuggestions = await generateSmartTaskSuggestions(ocrResult.text);
+    
+    return {
+      ...ocrResult,
+      taskSuggestions
+    };
   }
 }
 
@@ -135,14 +182,20 @@ export async function extractTasksFromText(text: string): Promise<TaskSuggestion
 
 /**
  * Generate task suggestions using AI
- * In a production app, this would call a sophisticated AI service
  */
 export async function generateSmartTaskSuggestions(text: string): Promise<TaskSuggestion[]> {
   try {
-    // Use OpenAI to extract tasks if possible
-    return await extractTasksWithOpenAI(text);
+    console.log(`Using ${AI_PROVIDER} for task extraction`);
+    
+    // Use the configured AI provider
+    if (AI_PROVIDER === 'gemini') {
+      return await extractTasksWithGemini(text);
+    } else {
+      // Fall back to OpenAI if configured
+      return await extractTasksWithOpenAI(text);
+    }
   } catch (error) {
-    console.error('Error using AI for task extraction:', error);
+    console.error(`Error using ${AI_PROVIDER} for task extraction:`, error);
     // Fallback to basic extraction
     const basicTasks = await extractTasksFromText(text);
     
@@ -163,4 +216,17 @@ export async function generateSmartTaskSuggestions(text: string): Promise<TaskSu
       return task;
     });
   }
+}
+
+/**
+ * Submit user feedback on task suggestions for improvement
+ */
+export async function provideTaskSuggestionFeedback(
+  feedback: {
+    taskSuggestion: TaskSuggestion,
+    isAccurate: boolean,
+    userComments?: string
+  }[]
+): Promise<string> {
+  return submitFeedbackForImprovement(feedback);
 } 

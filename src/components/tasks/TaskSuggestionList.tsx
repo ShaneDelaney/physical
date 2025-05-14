@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TaskSuggestion } from '@/types';
 import Button from '@/components/ui/Button';
-import { CheckIcon, XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { CheckIcon, XMarkIcon, PlusIcon, FaceSmileIcon, FaceFrownIcon } from '@heroicons/react/24/outline';
+import { provideTaskSuggestionFeedback } from '@/utils/ocr';
 
 interface TaskSuggestionListProps {
   suggestions: TaskSuggestion[];
@@ -16,9 +17,43 @@ const TaskSuggestionList: React.FC<TaskSuggestionListProps> = ({
   onReject,
   onAcceptAll,
 }) => {
+  const [feedback, setFeedback] = useState<Record<number, boolean | null>>({});
+  const [feedbackComment, setFeedbackComment] = useState('');
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  
   if (suggestions.length === 0) {
     return null;
   }
+
+  const handleFeedback = (index: number, isPositive: boolean) => {
+    setFeedback(prev => ({
+      ...prev,
+      [index]: isPositive
+    }));
+  };
+  
+  const submitFeedback = async () => {
+    if (Object.keys(feedback).length === 0) return;
+    
+    const feedbackItems = Object.entries(feedback).map(([indexStr, isPositive]) => {
+      const index = parseInt(indexStr, 10);
+      return {
+        taskSuggestion: suggestions[index],
+        isAccurate: Boolean(isPositive),
+        userComments: feedbackComment
+      };
+    });
+    
+    try {
+      await provideTaskSuggestionFeedback(feedbackItems);
+      setFeedbackSubmitted(true);
+      setTimeout(() => {
+        setFeedbackSubmitted(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+    }
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-4">
@@ -77,6 +112,25 @@ const TaskSuggestionList: React.FC<TaskSuggestionListProps> = ({
                     </span>
                   ))}
                 </div>
+                
+                {/* Feedback buttons */}
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-xs text-gray-500">Is this suggestion accurate?</span>
+                  <button 
+                    onClick={() => handleFeedback(index, true)}
+                    className={`p-1 rounded-full ${feedback[index] === true ? 'bg-green-100 text-green-600' : 'text-gray-400 hover:text-green-500'}`}
+                    aria-label="Yes, this is accurate"
+                  >
+                    <FaceSmileIcon className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => handleFeedback(index, false)}
+                    className={`p-1 rounded-full ${feedback[index] === false ? 'bg-red-100 text-red-600' : 'text-gray-400 hover:text-red-500'}`}
+                    aria-label="No, this is not accurate"
+                  >
+                    <FaceFrownIcon className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               
               <div className="flex gap-2">
@@ -102,6 +156,33 @@ const TaskSuggestionList: React.FC<TaskSuggestionListProps> = ({
           </div>
         ))}
       </div>
+      
+      {/* Feedback section */}
+      {Object.keys(feedback).length > 0 && (
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <h4 className="text-sm font-medium mb-2">Help us improve</h4>
+          <textarea
+            placeholder="Any comments on these suggestions? (optional)"
+            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-sm resize-none"
+            rows={2}
+            value={feedbackComment}
+            onChange={e => setFeedbackComment(e.target.value)}
+          />
+          <div className="mt-2 flex justify-end">
+            <Button 
+              size="sm"
+              onClick={submitFeedback}
+              variant="outline"
+              className="text-xs"
+            >
+              Submit Feedback
+            </Button>
+          </div>
+          {feedbackSubmitted && (
+            <p className="text-green-600 text-xs mt-2">Thank you for your feedback!</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
